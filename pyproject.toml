@@ -1,44 +1,33 @@
-@'
-[project]
-name = "gpu-workload-benchmarking-suite"
-version = "0.1.0"
-description = "Repeatable GPU workload benchmarks for PyTorch/CUDA: throughput, memory, utilization, and logs."
-readme = "README.md"
-requires-python = ">=3.10"
-license = { file = "LICENSE" }
-authors = [{ name = "Venkata Naga" }]
-dependencies = [
-  "torch",
-  "typer>=0.12",
-  "pyyaml>=6.0",
-  "psutil>=5.9",
-  "pandas>=2.0",
-  "matplotlib>=3.7",
-  "pynvml>=11.5; platform_system == 'Linux' or platform_system == 'Windows'",
-]
-
-[project.optional-dependencies]
-dev = [
-  "pytest>=7.0",
-  "ruff>=0.5",
-  "black>=24.0",
-]
-
-[project.scripts]
-benchkit = "benchkit.cli:app"
-
-[tool.black]
-line-length = 100
-target-version = ["py310"]
-
-[tool.ruff]
-line-length = 100
-target-version = "py310"
-select = ["E", "F", "I", "B", "UP"]
-ignore = ["E501"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-addopts = "-q"
-
-'@ | Set-Content -Encoding UTF8 pyproject.toml
+(
+echo [build-system]
+echo requires = ["setuptools>=68", "wheel"]
+echo build-backend = "setuptools.build_meta"
+echo.
+echo [project]
+echo name = "gpu-workload-benchmarking-suite"
+echo version = "0.1.0"
+echo description = "Repeatable GPU workload benchmarks for PyTorch/CUDA workloads."
+echo readme = "README.md"
+echo requires-python = ">=3.10"
+echo license = { file = "LICENSE" }
+echo authors = [{ name = "Venkata Naga" }]
+echo dependencies = [
+echo   "typer>=0.12",
+echo   "pyyaml>=6.0",
+echo   "psutil>=5.9",
+echo   "pandas>=2.0",
+echo   "matplotlib>=3.7"
+echo ]
+echo.
+echo [project.optional-dependencies]
+echo dev = ["pytest>=7.0", "ruff>=0.5", "black>=24.0"]
+echo.
+echo [project.scripts]
+echo benchkit = "benchkit.cli:app"
+echo.
+echo [tool.black]
+echo line-length = 100
+echo.
+echo [tool.ruff]
+echo line-length = 100
+echo select = ["E", "F"]()
