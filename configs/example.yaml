@@ -1,0 +1,10 @@
+name: smoke-test
+task: infer
+model: mlp
+device: cpu
+batch_size: 64
+steps: 30
+warmup: 5
+precision: fp32
+input_shape: [3, 224, 224]
+seed: 42
