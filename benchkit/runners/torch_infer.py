@@ -55,10 +55,19 @@ def run_inference(cfg: RunConfig) -> dict:
     throughput = samples / total_time if total_time > 0 else 0.0
     latency_ms = (total_time / cfg.steps) * 1000.0 if cfg.steps > 0 else 0.0
 
+    gpu = {}
+    if device.type == "cuda":
+        gpu = {
+            "cuda_max_memory_allocated_bytes": float(torch.cuda.max_memory_allocated()),
+            "cuda_max_memory_reserved_bytes": float(torch.cuda.max_memory_reserved()),
+        }
+
     return {
         "config": asdict(cfg),
         "device_used": str(device),
         "total_time_s": total_time,
         "throughput_samples_per_s": throughput,
         "latency_ms_per_step": latency_ms,
+        **gpu,
     }
+
