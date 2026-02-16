@@ -28,6 +28,9 @@ def _resolve_device(requested: str) -> torch.device:
 def run_inference(cfg: RunConfig) -> dict:
     device = _resolve_device(cfg.device)
 
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats()
+
     model = get_model(cfg.model, cfg.input_shape).to(device)
     model.eval()
 

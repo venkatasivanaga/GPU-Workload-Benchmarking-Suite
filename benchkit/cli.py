@@ -8,6 +8,9 @@ import typer
 from benchkit.config import load_config
 from benchkit.runners.torch_infer import run_inference
 from benchkit.utils.seed import seed_everything
+from benchkit.metrics.system import system_metrics
+from benchkit.utils.env import env_snapshot
+from benchkit.utils.jsonl import append_json
 
 app = typer.Typer(add_completion=False, help="GPU Workload Benchmarking Suite (CLI)")
 
@@ -44,6 +47,11 @@ def run(
 
     result = run_inference(cfg)
 
+    result["system"] = system_metrics()
+    result["env"] = env_snapshot()
+
+    append_jsonl("results/runs.jsonl", result)
+
     out_path = Path(out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
@@ -51,6 +59,10 @@ def run(
     typer.echo(f"Wrote: {out_path.as_posix()}")
     typer.echo(f"Throughput: {result['throughput_samples_per_s']:.2f} samples/s")
     typer.echo(f"Latency: {result['latency_ms_per_step']:.2f} ms/step")
+    typer.echo(f"CPU%: {result['system']['cpu_percent']:.1f} | RAM%: {result['system']['ram_percent']:.1f}")
+    if "cuda_max_memory_allocated_bytes" in result:
+        mb = result["cuda_max_memory_allocated_bytes"] / (1024**2)
+        typer.echo(f"Peak GPU allocated: {mb:.1f} MB")
 
 
 if __name__ == "__main__":
