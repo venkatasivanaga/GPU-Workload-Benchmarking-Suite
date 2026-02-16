@@ -2,26 +2,31 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Tuple, Union
 
 import yaml
+
+PathLike = Union[str, Path]
 
 
 @dataclass
 class RunConfig:
     name: str
-    task: str
+    task: str  # infer | train (train later)
     model: str
-    device: str = "cuda"
+
+    device: str = "cuda"  # cpu | cuda
     batch_size: int = 32
     steps: int = 50
     warmup: int = 10
-    precision: str = "fp32"
-    input_shape: tuple[int, int, int] = (3, 224, 224)
+
+    precision: str = "fp32"  # fp32 | fp16 | bf16 (used later)
+    input_shape: Tuple[int, int, int] = (3, 224, 224)
+
     seed: int = 42
 
 
-def load_config(path: str | Path) -> RunConfig:
+def load_config(path: PathLike) -> RunConfig:
     p = Path(path)
     if not p.exists():
         raise FileNotFoundError(f"Config not found: {p}")
@@ -35,7 +40,7 @@ def load_config(path: str | Path) -> RunConfig:
 
     inp = data.get("input_shape", [3, 224, 224])
     if isinstance(inp, list):
-        inp = tuple(inp)
+        inp = tuple(int(x) for x in inp)
 
     return RunConfig(
         name=str(data["name"]),
