@@ -11,6 +11,10 @@ from benchkit.utils.seed import seed_everything
 from benchkit.metrics.system import system_metrics
 from benchkit.utils.env import env_snapshot
 from benchkit.utils.jsonl import append_json
+from benchkit.reporting.export import jsonl_to_dataframe, write_summary_csv
+from benchkit.reporting.plots import plot_latency_vs_batch, plot_throughput_vs_batch
+from benchkit.reporting.report_md import write_report_md
+
 
 app = typer.Typer(add_completion=False, help="GPU Workload Benchmarking Suite (CLI)")
 
@@ -19,6 +23,29 @@ app = typer.Typer(add_completion=False, help="GPU Workload Benchmarking Suite (C
 def main() -> None:
     """Benchkit CLI root."""
     return
+
+
+@app.command()
+def report(
+    jsonl: str = typer.Option("results/runs.jsonl", help="Input JSONL path"),
+    out_dir: str = typer.Option("results", help="Output directory"),
+) -> None:
+    """Generate summary CSV + report markdown + plots from runs.jsonl."""
+    outp = Path(out_dir)
+    outp.mkdir(parents=True, exist_ok=True)
+
+    df = jsonl_to_dataframe(jsonl)
+
+    csv_path = write_summary_csv(jsonl, outp / "summary.csv")
+    plot_dir = outp / "plots"
+    plot1 = plot_throughput_vs_batch(df, plot_dir / "throughput_vs_batch.png")
+    plot2 = plot_latency_vs_batch(df, plot_dir / "latency_vs_batch.png")
+    md_path = write_report_md(df, outp / "report.md")
+
+    typer.echo(f"Wrote: {csv_path}")
+    typer.echo(f"Wrote: {md_path}")
+    typer.echo(f"Wrote: {plot1}")
+    typer.echo(f"Wrote: {plot2}")
 
 
 @app.command()
